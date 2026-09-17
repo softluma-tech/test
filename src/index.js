@@ -33,9 +33,11 @@ const start = async () => {
         if (config.miniAppUrl) {
             try {
                 await bot.telegram.setChatMenuButton({
-                    type: 'web_app',
-                    text: 'Open app',
-                    web_app: { url: config.miniAppUrl },
+                    menuButton: {
+                        type: 'web_app',
+                        text: 'Open app',
+                        web_app: { url: config.miniAppUrl },
+                    },
                 });
                 logger.info('Mini App menu button set');
             } catch (err) {
