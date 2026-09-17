@@ -1,22 +1,32 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
   <title>Signal Tracker</title>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     :root {
-      --bg: #0f1115;
-      --card: #171a20;
-      --text: #ffffff;
-      --hint: #7d8590;
-      --link: #4f91f4;
-      --green: #22c55e;
-      --green-soft: rgba(34, 197, 94, 0.12);
-      --red: #ef4444;
-      --red-soft: rgba(239, 68, 68, 0.12);
-      --border: rgba(255, 255, 255, 0.08);
+      --bg: #090b10;
+      --card: #11151d;
+      --card-alt: #161b24;
+      --text: #f5f7fa;
+      --muted: #8993a4;
+      --border: rgba(255, 255, 255, 0.07);
+      --green: #20d77a;
+      --green-dark: #0fa85b;
+      --red: #ff5263;
+      --blue: #628cff;
+      --blue-soft: rgba(98, 140, 255, 0.12);
+      --green-soft: rgba(32, 215, 122, 0.09);
+      --red-soft: rgba(255, 82, 99, 0.09);
     }
 
     * {
@@ -28,96 +38,215 @@
 
     html,
     body {
-      height: 100%;
+      min-height: 100%;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+      font-family:
+        Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+      padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
       user-select: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     #app {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      flex: 1;
     }
 
-    header {
-      text-align: center;
-      padding: 6px 0 2px;
+    /* HEADER */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 2px 10px;
     }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--green-soft);
+      border: 1px solid rgba(32, 215, 122, 0.22);
+      color: var(--green);
+      font-size: 21px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(32, 215, 122, 0.2);
+      background: var(--green-soft);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: 0.06em;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 9px rgba(32, 215, 122, 0.8);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    /* GREETING */
 
     .greeting {
-      font-size: 13px;
-      color: var(--hint);
-      margin-bottom: 4px;
+      padding: 2px 2px 4px;
     }
 
-    .title {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+    .greeting-small {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
     }
+
+    .greeting-title {
+      font-size: 27px;
+      line-height: 1.18;
+      font-weight: 850;
+      letter-spacing: -0.055em;
+    }
+
+    .greeting-title span {
+      color: var(--green);
+    }
+
+    .greeting-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    /* CARDS */
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px 18px 16px;
+      border-radius: 21px;
+      padding: 20px;
       position: relative;
       overflow: hidden;
     }
 
-    .card-label {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--hint);
-      margin-bottom: 14px;
-      text-align: center;
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    .donut-wrap {
+    .card-label {
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .card-heading {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-top: 6px;
+    }
+
+    .mini-tag {
+      font-size: 10px;
+      font-weight: 750;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
+      white-space: nowrap;
+    }
+
+    /* TRACK RECORD */
+
+    .record-card {
+      padding-bottom: 21px;
+    }
+
+    .record-chart {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      padding: 1px 0 6px;
     }
 
     .donut {
+      width: 210px;
+      height: 210px;
       position: relative;
-      width: 190px;
-      height: 190px;
     }
 
     .donut svg {
       width: 100%;
       height: 100%;
       transform: rotate(-90deg);
+      overflow: visible;
     }
 
-    .donut .track {
+    .donut-track {
       fill: none;
       stroke: var(--red);
-      stroke-width: 20;
-      stroke-linecap: round;
-      opacity: 0.18;
+      stroke-width: 17;
+      opacity: 0.15;
     }
 
-    .donut .fill {
+    .donut-fill {
       fill: none;
-      stroke: url(#gradGreen);
-      stroke-width: 20;
+      stroke: url(#greenGradient);
+      stroke-width: 17;
       stroke-linecap: round;
+      transition: stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .donut-center {
@@ -127,14 +256,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
     }
 
     .donut-value {
-      font-size: 42px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+      font-size: 47px;
+      font-weight: 850;
       line-height: 1;
+      letter-spacing: -0.065em;
+      font-variant-numeric: tabular-nums;
     }
 
     .donut-value span {
@@ -142,406 +271,990 @@
     }
 
     .donut-caption {
-      font-size: 11px;
-      font-weight: 700;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--hint);
-      margin-top: 6px;
+      margin-top: 10px;
     }
 
-    .legend {
+    .record-footer {
       display: flex;
-      justify-content: center;
-      gap: 26px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
       gap: 8px;
-      font-size: 13px;
-      color: var(--hint);
+      margin-top: 16px;
     }
 
-    .legend-item b {
-      color: var(--text);
+    .record-stat {
+      flex: 1;
+      min-width: 0;
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 13px 10px;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .dot.green {
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green);
-    }
-
-    .dot.red {
-      background: var(--red);
-      box-shadow: 0 0 8px var(--red);
-    }
-
-    .input-wrap {
+    .record-stat-top {
       display: flex;
       align-items: center;
       gap: 6px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-top: 8px;
-      transition: border-color 0.2s;
-    }
-
-    .input-wrap:focus-within {
-      border-color: var(--link);
-    }
-
-    .prefix {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--hint);
-    }
-
-    #amountInput {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      min-width: 0;
-    }
-
-    #amountInput::placeholder {
-      color: var(--hint);
-      opacity: 0.6;
-    }
-
-    .profit-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 16px;
-      background: var(--green-soft);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-      border-radius: 14px;
-      padding: 14px 16px;
-    }
-
-    .profit-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--green);
-    }
-
-    .profit-label small {
-      display: block;
       font-size: 11px;
-      font-weight: 500;
-      opacity: 0.75;
-      margin-top: 2px;
+      color: var(--muted);
+      white-space: nowrap;
     }
 
-    .profit-value {
-      font-size: 26px;
-      font-weight: 800;
+    .stat-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .stat-dot.green {
+      background: var(--green);
+    }
+
+    .stat-dot.red {
+      background: var(--red);
+    }
+
+    .record-stat-value {
+      margin-top: 9px;
+      font-size: 21px;
+      font-weight: 850;
+      letter-spacing: -0.045em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .record-stat-value.green {
       color: var(--green);
-      letter-spacing: -0.02em;
     }
 
-    .countdown-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .record-stat-value.red {
+      color: var(--red);
+    }
+
+    /* CALCULATOR */
+
+    .calculator-card {
       padding-bottom: 20px;
     }
 
-    .cd-ring {
-      position: relative;
-      width: 170px;
-      height: 170px;
+    .input-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+      margin-bottom: 9px;
     }
 
-    .cd-ring svg {
+    .amount-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--bg);
+      padding: 13px 15px;
+      transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+    }
+
+    .amount-wrap:focus-within {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(98, 140, 255, 0.08);
+    }
+
+    .currency {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    #amountInput {
+      width: 100%;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 27px;
+      font-weight: 850;
+      letter-spacing: -0.045em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #amountInput::placeholder {
+      color: var(--muted);
+      opacity: 0.45;
+    }
+
+    .preset-row {
+      display: flex;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .preset-btn {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--card-alt);
+      color: var(--muted);
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 750;
+      transition:
+        background 0.2s,
+        color 0.2s;
+    }
+
+    .preset-btn:active {
+      background: var(--blue-soft);
+      color: var(--text);
+    }
+
+    .profit-result {
+      margin-top: 17px;
+      padding: 16px;
+      border-radius: 15px;
+      background: var(--green-soft);
+      border: 1px solid rgba(32, 215, 122, 0.19);
+    }
+
+    .profit-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .profit-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .profit-desc {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 5px;
+    }
+
+    .profit-value {
+      color: var(--green);
+      font-size: 27px;
+      font-weight: 850;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .profit-divider {
+      height: 1px;
+      background: rgba(32, 215, 122, 0.12);
+      margin: 15px 0;
+    }
+
+    .profit-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .profit-detail-label {
+      color: var(--muted);
+      font-size: 10px;
+      margin-bottom: 4px;
+    }
+
+    .profit-detail-value {
+      font-size: 12px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* COUNTDOWN */
+
+    .countdown-card {
+      text-align: center;
+      padding-bottom: 23px;
+    }
+
+    .countdown-header {
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    .countdown-ring {
+      width: 190px;
+      height: 190px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .countdown-ring svg {
       width: 100%;
       height: 100%;
       transform: rotate(-90deg);
+      overflow: visible;
     }
 
-    .cd-ring .ring-track {
+    .ring-track {
       fill: none;
-      stroke: var(--bg);
-      stroke-width: 9;
-      stroke-linecap: round;
+      stroke: var(--card-alt);
+      stroke-width: 10;
     }
 
-    .cd-ring .ring-fill {
+    .ring-fill {
       fill: none;
-      stroke: var(--link);
-      stroke-width: 9;
+      stroke: var(--blue);
+      stroke-width: 10;
       stroke-linecap: round;
-      transition: stroke-dashoffset 1s linear;
+      transition: stroke-dashoffset 0.8s linear;
+      filter: drop-shadow(0 0 4px rgba(98, 140, 255, 0.18));
     }
 
-    .cd-center {
+    .countdown-center {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
     }
 
-    .cd-tag {
-      font-size: 11px;
-      font-weight: 700;
+    .countdown-tag {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--hint);
     }
 
-    .cd-time {
-      font-size: 44px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+    .countdown-time {
+      margin-top: 8px;
+      font-size: 43px;
+      font-weight: 850;
+      letter-spacing: -0.06em;
       font-variant-numeric: tabular-nums;
-      margin-top: 4px;
+      line-height: 1;
     }
 
-    .cd-hint {
-      font-size: 12px;
-      color: var(--hint);
-      margin-top: 12px;
-      text-align: center;
+    .countdown-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 13px;
+      color: var(--blue);
+      font-size: 10px;
+      font-weight: 750;
     }
 
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: var(--hint);
-      padding: 8px 0 0;
+    .countdown-status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--blue);
+      border-radius: 50%;
     }
+
+    .countdown-hint {
+      margin-top: 18px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .refresh-line {
+      width: 100%;
+      height: 3px;
+      background: var(--card-alt);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 17px;
+    }
+
+    .refresh-progress {
+      height: 100%;
+      width: 100%;
+      background: var(--blue);
+      border-radius: inherit;
+      transition: width 1s linear;
+    }
+
+    /* ERROR */
 
     .error-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
       background: var(--red-soft);
-      border: 1px solid rgba(239, 68, 68, 0.35);
+      border: 1px solid rgba(255, 82, 99, 0.25);
+      border-radius: 15px;
+      padding: 14px;
       color: var(--red);
-      border-radius: 14px;
-      padding: 16px;
-      font-size: 14px;
-      text-align: center;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .error-icon {
+      flex-shrink: 0;
+      font-size: 15px;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
-    .pulse {
-      animation: pulseAnim 1s ease-in-out infinite;
+    /* FOOTER */
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.03em;
+      padding: 6px 0 2px;
     }
 
-    @keyframes pulseAnim {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.45; }
+    .footer span {
+      color: var(--green);
+    }
+
+    /* ANIMATIONS */
+
+    .fade-up {
+      animation: fadeUp 0.55s ease both;
+    }
+
+    .delay-1 {
+      animation-delay: 0.06s;
+    }
+
+    .delay-2 {
+      animation-delay: 0.12s;
+    }
+
+    .delay-3 {
+      animation-delay: 0.18s;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.45;
+        transform: scale(0.8);
+      }
+    }
+
+    @media (max-width: 360px) {
+      body {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .card {
+        padding: 17px;
+        border-radius: 18px;
+      }
+
+      .greeting-title {
+        font-size: 24px;
+      }
+
+      .donut {
+        width: 185px;
+        height: 185px;
+      }
+
+      .donut-value {
+        font-size: 41px;
+      }
+
+      .record-stat-value {
+        font-size: 18px;
+      }
+
+      .countdown-ring {
+        width: 175px;
+        height: 175px;
+      }
+
+      .countdown-time {
+        font-size: 38px;
+      }
+
+      .profit-value {
+        font-size: 23px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div id="app">
-    <header>
-      <div class="greeting">Hello, <span id="userName">Trader</span> 👋</div>
-      <div class="title">📈 Signal Tracker</div>
+  <main id="app">
+
+    <!-- HEADER -->
+    <header class="header fade-up">
+      <div class="brand">
+        <div class="brand-icon">↗</div>
+        <div>
+          <div class="eyebrow">BFSS Trading</div>
+          <div class="brand-title">Signal Tracker</div>
+        </div>
+      </div>
+
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        LIVE
+      </div>
     </header>
 
-    <div id="errorCard" class="error-card hidden"></div>
+    <!-- GREETING -->
+    <section class="greeting fade-up delay-1">
+      <div class="greeting-small">
+        Welcome back, <span id="userName">Trader</span> 👋
+      </div>
 
-    <div class="card">
-      <div class="card-label">Track Record</div>
-      <div class="donut-wrap">
+      <h1 class="greeting-title">
+        Track your<br />
+        <span>trading performance.</span>
+      </h1>
+
+      <p class="greeting-subtitle">
+        Monitor your record, estimate returns,<br />
+        and stay ready for the next signal.
+      </p>
+    </section>
+
+    <!-- ERROR -->
+    <div id="errorCard" class="error-card hidden" role="alert">
+      <span class="error-icon">!</span>
+      <span id="errorMessage"></span>
+    </div>
+
+    <!-- TRACK RECORD -->
+    <section class="card record-card fade-up delay-1">
+      <div class="card-header">
+        <div>
+          <div class="card-label">Performance Overview</div>
+          <div class="card-heading">Track Record</div>
+        </div>
+
+        <div class="mini-tag">Overall</div>
+      </div>
+
+      <div class="record-chart">
         <div class="donut">
-          <svg viewBox="0 0 190 190">
+          <svg viewBox="0 0 210 210" aria-label="Win rate chart">
             <defs>
-              <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#22c55e" />
-                <stop offset="100%" stop-color="#16a34a" />
+              <linearGradient
+                id="greenGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stop-color="#20d77a" />
+                <stop offset="100%" stop-color="#0fa85b" />
               </linearGradient>
             </defs>
-            <circle class="track" cx="95" cy="95" r="72"></circle>
-            <circle id="donutFill" class="fill" cx="95" cy="95" r="72"></circle>
+
+            <circle
+              class="donut-track"
+              cx="105"
+              cy="105"
+              r="79"
+            ></circle>
+
+            <circle
+              id="donutFill"
+              class="donut-fill"
+              cx="105"
+              cy="105"
+              r="79"
+            ></circle>
           </svg>
+
           <div class="donut-center">
-            <div class="donut-value"><span id="winPct">87</span>%</div>
+            <div class="donut-value">
+              <span id="winPct">87</span>%
+            </div>
+
             <div class="donut-caption">Win Rate</div>
           </div>
         </div>
-        <div class="legend">
-          <div class="legend-item"><span class="dot green"></span>Win Rate <b>87%</b></div>
-          <div class="legend-item"><span class="dot red"></span>Loss Rate <b>13%</b></div>
+      </div>
+
+      <div class="record-footer">
+        <div class="record-stat">
+          <div class="record-stat-top">
+            <span class="stat-dot green"></span>
+            Wins
+          </div>
+
+          <div class="record-stat-value green">
+            <span id="winCount">87</span>%
+          </div>
+        </div>
+
+        <div class="record-stat">
+          <div class="record-stat-top">
+            <span class="stat-dot red"></span>
+            Losses
+          </div>
+
+          <div class="record-stat-value red">
+            <span id="lossPct">13</span>%
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="card-label">Profit Calculator</div>
-      <div class="input-wrap" id="amountWrap">
-        <span class="prefix">$</span>
-        <input id="amountInput" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" />
-      </div>
-      <div class="profit-row">
+    <!-- PROFIT CALCULATOR -->
+    <section class="card calculator-card fade-up delay-2">
+      <div class="card-header">
         <div>
-          <div class="profit-label">Daily Profit</div>
-          <small style="display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:2px;color:var(--hint);">35% of your investment</small>
+          <div class="card-label">Estimate Returns</div>
+          <div class="card-heading">Profit Calculator</div>
         </div>
-        <div class="profit-value">$<span id="profitValue">0.00</span></div>
-      </div>
-    </div>
 
-    <div class="card countdown-card">
-      <div class="card-label">Next Signal</div>
-      <div class="cd-ring">
-        <svg viewBox="0 0 170 170">
-          <circle class="ring-track" cx="85" cy="85" r="72"></circle>
-          <circle id="ringFill" class="ring-fill" cx="85" cy="85" r="72"></circle>
+        <div class="mini-tag">35% Rate</div>
+      </div>
+
+      <div class="input-label">Investment Amount</div>
+
+      <div class="amount-wrap" id="amountWrap">
+        <span class="currency">$</span>
+
+        <input
+          id="amountInput"
+          type="text"
+          inputmode="decimal"
+          placeholder="0.00"
+          autocomplete="off"
+          aria-label="Investment amount"
+        />
+      </div>
+
+      <div class="preset-row">
+        <button class="preset-btn" type="button" data-amount="10">
+          $10
+        </button>
+
+        <button class="preset-btn" type="button" data-amount="50">
+          $50
+        </button>
+
+        <button class="preset-btn" type="button" data-amount="100">
+          $100
+        </button>
+
+        <button class="preset-btn" type="button" data-amount="500">
+          $500
+        </button>
+      </div>
+
+      <div class="profit-result">
+        <div class="profit-top">
+          <div>
+            <div class="profit-label">Estimated Daily Profit</div>
+            <div class="profit-desc">Based on a 35% calculation rate</div>
+          </div>
+
+          <div class="profit-value">
+            $<span id="profitValue">0.00</span>
+          </div>
+        </div>
+
+        <div class="profit-divider"></div>
+
+        <div class="profit-bottom">
+          <div>
+            <div class="profit-detail-label">Investment</div>
+            <div class="profit-detail-value">
+              $<span id="investmentValue">0.00</span>
+            </div>
+          </div>
+
+          <div style="text-align: right;">
+            <div class="profit-detail-label">Total After Estimate</div>
+            <div class="profit-detail-value">
+              $<span id="totalValue">0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COUNTDOWN -->
+    <section class="card countdown-card fade-up delay-3">
+      <div class="card-header countdown-header">
+        <div>
+          <div class="card-label">Signal Schedule</div>
+          <div class="card-heading">Next Signal</div>
+        </div>
+
+        <div class="mini-tag">Auto Refresh</div>
+      </div>
+
+      <div class="countdown-ring">
+        <svg viewBox="0 0 190 190" aria-label="Signal countdown">
+          <circle
+            class="ring-track"
+            cx="95"
+            cy="95"
+            r="78"
+          ></circle>
+
+          <circle
+            id="ringFill"
+            class="ring-fill"
+            cx="95"
+            cy="95"
+            r="78"
+          ></circle>
         </svg>
-        <div class="cd-center">
-          <div class="cd-tag">Incoming</div>
-          <div class="cd-time" id="countdown">2:00</div>
+
+        <div class="countdown-center">
+          <div class="countdown-tag">Incoming</div>
+
+          <div class="countdown-time" id="countdown">
+            2:00
+          </div>
+
+          <div class="countdown-status">
+            <span class="countdown-status-dot"></span>
+            Waiting for signal
+          </div>
         </div>
       </div>
-      <div class="cd-hint">New signal refreshes automatically</div>
-    </div>
 
-    <footer>Happy Trading 🚀</footer>
-  </div>
+      <div class="countdown-hint">
+        The timer refreshes automatically.<br />
+        Stay ready for the next signal.
+      </div>
+
+      <div class="refresh-line">
+        <div id="refreshProgress" class="refresh-progress"></div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      Trade responsibly · <span>Happy Trading 🚀</span>
+    </footer>
+
+  </main>
 
   <script>
     (function () {
       "use strict";
 
-      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      /* ==========================================
+         TELEGRAM INITIALIZATION
+      ========================================== */
+
+      const tg =
+        window.Telegram && window.Telegram.WebApp
+          ? window.Telegram.WebApp
+          : null;
 
       if (tg) {
         tg.ready();
+
         if (tg.expand) tg.expand();
-        if (tg.setHeaderColor) tg.setHeaderColor("bg_color");
-        if (tg.setBackgroundColor) tg.setBackgroundColor("bg_color");
+
+        if (tg.setHeaderColor) {
+          tg.setHeaderColor("bg_color");
+        }
+
+        if (tg.setBackgroundColor) {
+          tg.setBackgroundColor("bg_color");
+        }
       }
 
+      /* ==========================================
+         THEME
+      ========================================== */
+
       const tp = (tg && tg.themeParams) || {};
+
       const theme = {
-        bg: tp.bg_color || "#0f1115",
-        card: tp.secondary_bg_color || "#171a20",
-        text: tp.text_color || "#ffffff",
-        hint: tp.hint_color || "#7d8590",
-        link: tp.link_color || "#4f91f4",
-        button: tp.button_color || "#4f91f4",
+        bg: tp.bg_color || "#090b10",
+        card: tp.secondary_bg_color || "#11151d",
+        text: tp.text_color || "#f5f7fa",
+        muted: tp.hint_color || "#8993a4",
+        blue: tp.link_color || "#628cff"
       };
 
       const root = document.documentElement.style;
+
       root.setProperty("--bg", theme.bg);
       root.setProperty("--card", theme.card);
       root.setProperty("--text", theme.text);
-      root.setProperty("--hint", theme.hint);
-      root.setProperty("--link", theme.link);
+      root.setProperty("--muted", theme.muted);
+      root.setProperty("--blue", theme.blue);
 
       if (tg && tg.onEvent) {
         tg.onEvent("themeChanged", function () {
-          window.location.reload();
+          const updatedParams = tg.themeParams || {};
+
+          root.setProperty(
+            "--bg",
+            updatedParams.bg_color || "#090b10"
+          );
+
+          root.setProperty(
+            "--card",
+            updatedParams.secondary_bg_color || "#11151d"
+          );
+
+          root.setProperty(
+            "--text",
+            updatedParams.text_color || "#f5f7fa"
+          );
+
+          root.setProperty(
+            "--muted",
+            updatedParams.hint_color || "#8993a4"
+          );
+
+          root.setProperty(
+            "--blue",
+            updatedParams.link_color || "#628cff"
+          );
         });
       }
 
-      const errorCard = document.getElementById("errorCard");
-      const showError = function (msg) {
-        errorCard.textContent = msg;
-        errorCard.classList.remove("hidden");
-      };
+      /* ==========================================
+         ERROR HANDLING
+      ========================================== */
 
-      const donutC = 2 * Math.PI * 72;
+      const errorCard = document.getElementById("errorCard");
+      const errorMessage = document.getElementById("errorMessage");
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorCard.classList.remove("hidden");
+      }
+
+      /* ==========================================
+         WIN RATE CHART
+      ========================================== */
+
+      const WIN_RATE = 87;
+      const LOSS_RATE = 100 - WIN_RATE;
+
       const donutFill = document.getElementById("donutFill");
-      donutFill.style.strokeDasharray = donutC + " " + donutC;
-      donutFill.style.strokeDashoffset = donutC;
-      donutFill.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1)";
+      const winPct = document.getElementById("winPct");
+      const winCount = document.getElementById("winCount");
+      const lossPct = document.getElementById("lossPct");
+
+      winPct.textContent = WIN_RATE;
+      winCount.textContent = WIN_RATE;
+      lossPct.textContent = LOSS_RATE;
+
+      const donutRadius = 79;
+      const donutCircumference = 2 * Math.PI * donutRadius;
+
+      donutFill.style.strokeDasharray =
+        donutCircumference + " " + donutCircumference;
+
+      donutFill.style.strokeDashoffset = donutCircumference;
 
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
-          donutFill.style.strokeDashoffset = donutC * 0.13;
+          donutFill.style.strokeDashoffset =
+            donutCircumference * (1 - WIN_RATE / 100);
         });
       });
 
-      const profitEl = document.getElementById("profitValue");
-      const amountEl = document.getElementById("amountInput");
+      /* ==========================================
+         PROFIT CALCULATOR
+      ========================================== */
 
-      amountEl.addEventListener("input", function () {
-        let raw = amountEl.value.replace(/[^0-9.]/g, "");
+      const PROFIT_RATE = 0.35;
+
+      const amountInput = document.getElementById("amountInput");
+      const profitValue = document.getElementById("profitValue");
+      const investmentValue = document.getElementById("investmentValue");
+      const totalValue = document.getElementById("totalValue");
+
+      function formatAmount(value) {
+        return Number(value).toFixed(2);
+      }
+
+      function updateProfit(rawValue) {
+        let raw = String(rawValue)
+          .replace(/[^0-9.]/g, "");
+
         const firstDot = raw.indexOf(".");
+
         if (firstDot !== -1) {
-          raw = raw.slice(0, firstDot + 1) + raw.slice(firstDot + 1).replace(/\./g, "").slice(0, 2);
+          raw =
+            raw.slice(0, firstDot + 1) +
+            raw.slice(firstDot + 1)
+              .replace(/\./g, "")
+              .slice(0, 2);
         }
-        if (raw !== amountEl.value) amountEl.value = raw;
-        const num = parseFloat(raw) || 0;
-        profitEl.textContent = (num * 0.35).toFixed(2);
+
+        if (raw.startsWith(".")) {
+          raw = "0" + raw;
+        }
+
+        amountInput.value = raw;
+
+        const amount = parseFloat(raw) || 0;
+        const profit = amount * PROFIT_RATE;
+        const total = amount + profit;
+
+        profitValue.textContent = formatAmount(profit);
+        investmentValue.textContent = formatAmount(amount);
+        totalValue.textContent = formatAmount(total);
+      }
+
+      amountInput.addEventListener("input", function () {
+        updateProfit(amountInput.value);
       });
 
-      var TOTAL = 120;
-      let remaining = TOTAL;
-      const timeEl = document.getElementById("countdown");
+      document.querySelectorAll("[data-amount]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          updateProfit(button.dataset.amount);
+          amountInput.focus();
+        });
+      });
+
+      /* ==========================================
+         COUNTDOWN
+      ========================================== */
+
+      const TOTAL_SECONDS = 120;
+
+      let remaining = TOTAL_SECONDS;
+
+      const countdownEl = document.getElementById("countdown");
       const ringFill = document.getElementById("ringFill");
-      const ringC = 2 * Math.PI * 72;
-      ringFill.style.strokeDasharray = ringC + " " + ringC;
+      const refreshProgress = document.getElementById("refreshProgress");
+
+      const ringRadius = 78;
+      const ringCircumference = 2 * Math.PI * ringRadius;
+
+      ringFill.style.strokeDasharray =
+        ringCircumference + " " + ringCircumference;
+
       ringFill.style.strokeDashoffset = 0;
 
+      function updateCountdown() {
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+
+        countdownEl.textContent =
+          minutes + ":" + String(seconds).padStart(2, "0");
+
+        const progress = remaining / TOTAL_SECONDS;
+
+        ringFill.style.strokeDashoffset =
+          ringCircumference * (1 - progress);
+
+        refreshProgress.style.width = (progress * 100) + "%";
+      }
+
       function tick() {
-        const m = Math.floor(remaining / 60);
-        const s = remaining % 60;
-        timeEl.textContent = m + ":" + String(s).padStart(2, "0");
-        ringFill.style.strokeDashoffset = ringC * (1 - remaining / TOTAL);
-        remaining -= 1;
-        if (remaining < 0) remaining = TOTAL;
+        updateCountdown();
+
+        if (remaining <= 0) {
+          remaining = TOTAL_SECONDS;
+        } else {
+          remaining -= 1;
+        }
       }
 
       tick();
+
       setInterval(tick, 1000);
+
+      /* ==========================================
+         TELEGRAM SESSION VALIDATION
+      ========================================== */
 
       function validate() {
         const initData = tg ? tg.initData : "";
+
         if (!initData) {
-          showError("This app can only be opened from Telegram.");
+          showError(
+            "This app can only be opened from Telegram."
+          );
+
           return;
         }
+
         fetch("/app/api/validate", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData: initData }),
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            initData: initData
+          })
         })
-          .then(function (res) {
-            return res.json().then(function (data) {
-              return { ok: res.ok, data: data };
+          .then(function (response) {
+            return response.json().then(function (data) {
+              return {
+                ok: response.ok,
+                data: data
+              };
             });
           })
-          .then(function (out) {
-            if (out.ok && out.data.valid && out.data.user) {
+          .then(function (result) {
+            if (
+              result.ok &&
+              result.data.valid &&
+              result.data.user
+            ) {
               document.getElementById("userName").textContent =
-                out.data.user.first_name || "Trader";
+                result.data.user.first_name || "Trader";
             } else {
-              showError("Session expired. Please reopen the app from your bot.");
+              showError(
+                "Session expired. Please reopen the app from your bot."
+              );
             }
           })
           .catch(function () {
-            showError("Network error. Please try again.");
+            showError(
+              "Network error. Please try again."
+            );
           });
       }
 
       validate();
+
     })();
   </script>
 </body>

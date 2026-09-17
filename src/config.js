@@ -3,14 +3,16 @@ import logger from './utils/logger.js';
 
 dotenv.config();
 
+const rootUrl = process.env.WEBHOOK_URL ? process.env.WEBHOOK_URL.replace(/\/+$/, '') : null;
+
 export const config = {
     botToken: process.env.BOT_TOKEN,
     dbUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/quotex_bot',
     port: parseInt(process.env.PORT, 10) || 3000,
     adminId: parseInt(process.env.ADMIN_ID, 10) || null,
     webhookPath: '/softluma/tg-bot',
-    webhookUrl: process.env.WEBHOOK_URL || null,
-    miniAppUrl: process.env.MINI_APP_URL || (process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/app` : null),
+    webhookUrl: rootUrl,
+    miniAppUrl: process.env.MINI_APP_URL || (rootUrl ? `${rootUrl}/app` : null),
 };
 
 const missing = [];
