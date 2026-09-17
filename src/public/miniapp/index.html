@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Signal Tracker</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #171a20;
+      --text: #ffffff;
+      --hint: #7d8590;
+      --link: #4f91f4;
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.12);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.12);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+      user-select: none;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+    }
+
+    header {
+      text-align: center;
+      padding: 6px 0 2px;
+    }
+
+    .greeting {
+      font-size: 13px;
+      color: var(--hint);
+      margin-bottom: 4px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--hint);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .donut {
+      position: relative;
+      width: 190px;
+      height: 190px;
+    }
+
+    .donut svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .donut .track {
+      fill: none;
+      stroke: var(--red);
+      stroke-width: 20;
+      stroke-linecap: round;
+      opacity: 0.18;
+    }
+
+    .donut .fill {
+      fill: none;
+      stroke: url(#gradGreen);
+      stroke-width: 20;
+      stroke-linecap: round;
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .donut-value {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .donut-value span {
+      color: var(--green);
+    }
+
+    .donut-caption {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--hint);
+      margin-top: 6px;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 26px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--hint);
+    }
+
+    .legend-item b {
+      color: var(--text);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot.green {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    .dot.red {
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 8px;
+      transition: border-color 0.2s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--link);
+    }
+
+    .prefix {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--hint);
+    }
+
+    #amountInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      min-width: 0;
+    }
+
+    #amountInput::placeholder {
+      color: var(--hint);
+      opacity: 0.6;
+    }
+
+    .profit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      background: var(--green-soft);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .profit-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .profit-label small {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+
+    .profit-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -0.02em;
+    }
+
+    .countdown-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 20px;
+    }
+
+    .cd-ring {
+      position: relative;
+      width: 170px;
+      height: 170px;
+    }
+
+    .cd-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .cd-ring .ring-track {
+      fill: none;
+      stroke: var(--bg);
+      stroke-width: 9;
+      stroke-linecap: round;
+    }
+
+    .cd-ring .ring-fill {
+      fill: none;
+      stroke: var(--link);
+      stroke-width: 9;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .cd-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .cd-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--hint);
+    }
+
+    .cd-time {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      margin-top: 4px;
+    }
+
+    .cd-hint {
+      font-size: 12px;
+      color: var(--hint);
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--hint);
+      padding: 8px 0 0;
+    }
+
+    .error-card {
+      background: var(--red-soft);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: var(--red);
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .pulse {
+      animation: pulseAnim 1s ease-in-out infinite;
+    }
+
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="greeting">Hello, <span id="userName">Trader</span> 👋</div>
+      <div class="title">📈 Signal Tracker</div>
+    </header>
+
+    <div id="errorCard" class="error-card hidden"></div>
+
+    <div class="card">
+      <div class="card-label">Track Record</div>
+      <div class="donut-wrap">
+        <div class="donut">
+          <svg viewBox="0 0 190 190">
+            <defs>
+              <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#22c55e" />
+                <stop offset="100%" stop-color="#16a34a" />
+              </linearGradient>
+            </defs>
+            <circle class="track" cx="95" cy="95" r="72"></circle>
+            <circle id="donutFill" class="fill" cx="95" cy="95" r="72"></circle>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-value"><span id="winPct">87</span>%</div>
+            <div class="donut-caption">Win Rate</div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="dot green"></span>Win Rate <b>87%</b></div>
+          <div class="legend-item"><span class="dot red"></span>Loss Rate <b>13%</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Profit Calculator</div>
+      <div class="input-wrap" id="amountWrap">
+        <span class="prefix">$</span>
+        <input id="amountInput" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" />
+      </div>
+      <div class="profit-row">
+        <div>
+          <div class="profit-label">Daily Profit</div>
+          <small style="display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:2px;color:var(--hint);">35% of your investment</small>
+        </div>
+        <div class="profit-value">$<span id="profitValue">0.00</span></div>
+      </div>
+    </div>
+
+    <div class="card countdown-card">
+      <div class="card-label">Next Signal</div>
+      <div class="cd-ring">
+        <svg viewBox="0 0 170 170">
+          <circle class="ring-track" cx="85" cy="85" r="72"></circle>
+          <circle id="ringFill" class="ring-fill" cx="85" cy="85" r="72"></circle>
+        </svg>
+        <div class="cd-center">
+          <div class="cd-tag">Incoming</div>
+          <div class="cd-time" id="countdown">2:00</div>
+        </div>
+      </div>
+      <div class="cd-hint">New signal refreshes automatically</div>
+    </div>
+
+    <footer>Happy Trading 🚀</footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+      if (tg) {
+        tg.ready();
+        if (tg.expand) tg.expand();
+        if (tg.setHeaderColor) tg.setHeaderColor("bg_color");
+        if (tg.setBackgroundColor) tg.setBackgroundColor("bg_color");
+      }
+
+      const tp = (tg && tg.themeParams) || {};
+      const theme = {
+        bg: tp.bg_color || "#0f1115",
+        card: tp.secondary_bg_color || "#171a20",
+        text: tp.text_color || "#ffffff",
+        hint: tp.hint_color || "#7d8590",
+        link: tp.link_color || "#4f91f4",
+        button: tp.button_color || "#4f91f4",
+      };
+
+      const root = document.documentElement.style;
+      root.setProperty("--bg", theme.bg);
+      root.setProperty("--card", theme.card);
+      root.setProperty("--text", theme.text);
+      root.setProperty("--hint", theme.hint);
+      root.setProperty("--link", theme.link);
+
+      if (tg && tg.onEvent) {
+        tg.onEvent("themeChanged", function () {
+          window.location.reload();
+        });
+      }
+
+      const errorCard = document.getElementById("errorCard");
+      const showError = function (msg) {
+        errorCard.textContent = msg;
+        errorCard.classList.remove("hidden");
+      };
+
+      const donutC = 2 * Math.PI * 72;
+      const donutFill = document.getElementById("donutFill");
+      donutFill.style.strokeDasharray = donutC + " " + donutC;
+      donutFill.style.strokeDashoffset = donutC;
+      donutFill.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1)";
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          donutFill.style.strokeDashoffset = donutC * 0.13;
+        });
+      });
+
+      const profitEl = document.getElementById("profitValue");
+      const amountEl = document.getElementById("amountInput");
+
+      amountEl.addEventListener("input", function () {
+        let raw = amountEl.value.replace(/[^0-9.]/g, "");
+        const firstDot = raw.indexOf(".");
+        if (firstDot !== -1) {
+          raw = raw.slice(0, firstDot + 1) + raw.slice(firstDot + 1).replace(/\./g, "").slice(0, 2);
+        }
+        if (raw !== amountEl.value) amountEl.value = raw;
+        const num = parseFloat(raw) || 0;
+        profitEl.textContent = (num * 0.35).toFixed(2);
+      });
+
+      var TOTAL = 120;
+      let remaining = TOTAL;
+      const timeEl = document.getElementById("countdown");
+      const ringFill = document.getElementById("ringFill");
+      const ringC = 2 * Math.PI * 72;
+      ringFill.style.strokeDasharray = ringC + " " + ringC;
+      ringFill.style.strokeDashoffset = 0;
+
+      function tick() {
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        timeEl.textContent = m + ":" + String(s).padStart(2, "0");
+        ringFill.style.strokeDashoffset = ringC * (1 - remaining / TOTAL);
+        remaining -= 1;
+        if (remaining < 0) remaining = TOTAL;
+      }
+
+      tick();
+      setInterval(tick, 1000);
+
+      function validate() {
+        const initData = tg ? tg.initData : "";
+        if (!initData) {
+          showError("This app can only be opened from Telegram.");
+          return;
+        }
+        fetch("/app/api/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData: initData }),
+        })
+          .then(function (res) {
+            return res.json().then(function (data) {
+              return { ok: res.ok, data: data };
+            });
+          })
+          .then(function (out) {
+            if (out.ok && out.data.valid && out.data.user) {
+              document.getElementById("userName").textContent =
+                out.data.user.first_name || "Trader";
+            } else {
+              showError("Session expired. Please reopen the app from your bot.");
+            }
+          })
+          .catch(function () {
+            showError("Network error. Please try again.");
+          });
+      }
+
+      validate();
+    })();
+  </script>
+</body>
+</html>
