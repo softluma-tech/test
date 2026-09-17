@@ -10,7 +10,7 @@ export const config = {
     adminId: parseInt(process.env.ADMIN_ID, 10) || null,
     webhookPath: '/softluma/tg-bot',
     webhookUrl: process.env.WEBHOOK_URL || null,
-    miniAppUrl: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/app` : null,
+    miniAppUrl: process.env.MINI_APP_URL || (process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/app` : null),
 };
 
 const missing = [];

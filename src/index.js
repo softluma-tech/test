@@ -30,6 +30,19 @@ const start = async () => {
             process.exit(1);
         }
 
+        if (config.miniAppUrl) {
+            try {
+                await bot.telegram.setChatMenuButton({
+                    type: 'web_app',
+                    text: 'Open app',
+                    web_app: { url: config.miniAppUrl },
+                });
+                logger.info('Mini App menu button set');
+            } catch (err) {
+                logger.error('Failed to set Mini App menu button:', err);
+            }
+        }
+
         const isDev = process.env.NODE_ENV === 'development';
 
         let server;

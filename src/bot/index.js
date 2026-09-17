@@ -108,7 +108,7 @@ export const setupBot = () => {
     bot.command('app', maintenanceGuard, async (ctx) => {
         if (!config.miniAppUrl) {
             return ctx.reply(
-                `<b><tg-emoji emoji-id="5938290000415167172">❌</tg-emoji> The Signals Mini App is not configured yet. Please try again later.</b>`,
+                `<b><tg-emoji emoji-id="5938290000415167172">❌</tg-emoji> The Signals Mini App is not configured yet.\n\n<tg-emoji emoji-id="5938069973535559743">➡️</tg-emoji> Set <code>WEBHOOK_URL</code> or <code>MINI_APP_URL</code> in your environment and restart the bot.</b>`,
                 { parse_mode: 'HTML' },
             );
         }
